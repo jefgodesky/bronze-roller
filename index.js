@@ -4,6 +4,7 @@ const client = new Discord.Client()
 const { randomName } = require('./names')
 const config = require('./config.json')
 const emoji = {}
+const players = {}
 
 /**
  * Capitalize a string.
@@ -40,12 +41,36 @@ const findEmoji = () => {
 }
 
 /**
- * Interpret dice results for a Namedealer.
- * @param rolls {Object} - An object representing the dice roll results.
- * @returns {string} - A string interpreting dice results for a Namedealer.
+ * Record that the author of this message is playing a Namedealer.
+ * @param msg {Object} - The Discord.js message object.
  */
 
-const getNamedealerResults = rolls => {
+const assignNamedealer = msg => {
+  const { username } = msg.author
+  players[username] = 'Namedealer'
+}
+
+/**
+ * Record that the author of this message is playing a Fated Hero.
+ * @param msg {Object} - The Discord.js message object.
+ */
+
+const assignFatedHero = msg => {
+  const { username } = msg.author
+  players[username] = 'Fated Hero'
+}
+
+/**
+ * Interpret dice results for a Namedealer.
+ * @param rolls {Object} - An object representing the dice roll results.
+ * @param username {string} - The username of the person who sent the message.
+ * @returns {string|null} - A string interpreting dice results for a
+ *   Namedealer, or `null` if there's nothing to report for a Namedealer.
+ */
+
+const getNamedealerResults = (rolls, username) => {
+  if (players[username] === 'Fated Hero') return null
+
   const { gold, jet } = rolls.strikes
   let destinies = null
   if (gold + jet > 2) {
@@ -59,7 +84,7 @@ const getNamedealerResults = rolls => {
     vulnerability = 'you are vulnerable to your Named Ones now. They may demand a labor of you.'
   }
 
-  let reply = '**If you are a Namedealer,**'
+  let reply = players[username] === 'Namedealer' ? '**As a Namedealer**,' : '**If you are a Namedealer,**'
   if (destinies && vulnerability) {
     reply = `${reply} ${destinies}, and ${vulnerability}`
   } else if (destinies) {
@@ -76,10 +101,14 @@ const getNamedealerResults = rolls => {
 /**
  * Interpret dice results for a Fated Hero.
  * @param rolls {Object} - An object representing the dice roll results.
- * @returns {string} - A string interpreting dice results for a Fated Hero.
+ * @param username {string} - The username of the person who sent the message.
+ * @returns {string|null} - A string interpreting dice results for a Fated
+ *   Hero, or `null` if there's nothing to report for a Fated Hero.
  */
 
-const getFatedHeroResults = rolls => {
+const getFatedHeroResults = (rolls, username) => {
+  if (players[username] === 'Namedealer') return null
+
   const feat = rolls.strikes.gold > 2
     ? 'you may perform a mighty feat, granted abilities greater than those of other mortals. Take a third consequence.'
     : null
@@ -98,7 +127,7 @@ const getFatedHeroResults = rolls => {
     vulnerability = 'you are vulnerable to your Great Name now. They may demand a labor of you.'
   }
 
-  let reply = '**If you are a Fated Hero,**'
+  let reply = players[username] === 'Fated Hero' ? '**As a Fated Hero**,' : '**If you are a Fated Hero,**'
   if (feat && destinies && vulnerability) {
     reply = `${reply} ${feat} ${capitalize(destinies)}. ${capitalize(vulnerability)}`
   } else if (feat && destinies) {
@@ -128,6 +157,7 @@ const getFatedHeroResults = rolls => {
  */
 
 const roll = (msg, gold, jet) => {
+  const { username } = msg.author
   if (Object.keys(emoji).length === 0) findEmoji()
   const roll = { results: { gold: [], jet: [] }, strikes: { gold: 0, jet: 0 } }
   for (let g = 0; g < gold; g++) roll.results.gold.push(random.int(1, 6))
@@ -157,8 +187,8 @@ const roll = (msg, gold, jet) => {
     rolls.trim(),
     `You have rolled **${jetStrikesMsg}** upon your mortal dice of jet, and **${goldStrikesMsg}** upon your immortal dice of gold.`,
     outcome,
-    getNamedealerResults(roll),
-    getFatedHeroResults(roll)
+    getNamedealerResults(roll, username),
+    getFatedHeroResults(roll, username)
   ].filter(l => l !== null)
   msg.reply(reply.join('\n'))
 }
@@ -183,6 +213,14 @@ client.on('message', msg => {
     }
   } else if (m.startsWith('give me a random name')) {
     msg.reply(randomName())
+  } else if (m.startsWith('i portray a namedealer')) {
+    assignNamedealer(msg)
+  } else if (m.startsWith('my companion is a namedealer')) {
+    assignNamedealer(msg)
+  } else if (m.startsWith('i portray a fated hero')) {
+    assignFatedHero(msg)
+  } else if (m.startsWith('my companion is a fated hero')) {
+    assignFatedHero(msg)
   }
 })
 
