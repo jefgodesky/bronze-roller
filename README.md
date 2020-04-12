@@ -1,8 +1,14 @@
 # Bronze Roller
 
-This is a Discord bot that rolls dice for Joshua A.C. Newman's tabletop roleplaying game, _The Bloody-Handed Name of Bronze_. It rolls your mortal dice of jet and your immortal dice of gold. You can invite it to your server by using this link:
+This is a Discord bot that rolls dice for Joshua A.C. Newman's tabletop roleplaying game, _The Bloody-Handed Name of Bronze_. It rolls your mortal dice of jet and your immortal dice of gold.
 
-**[https://discordapp.com/oauth2/authorize?client_id=698552167283425431&scope=bot](https://discordapp.com/oauth2/authorize?client_id=698552167283425431&scope=bot)**
+## How to add it to your server
+
+1. Add the images listed in the `/images` directory as custom emoji for your server. The bot uses them to display dice roll results.
+1. Click this link: [https://discordapp.com/oauth2/authorize?client_id=698552167283425431&scope=bot](https://discordapp.com/oauth2/authorize?client_id=698552167283425431&scope=bot)
+1. Send a message that says `brhelp` to get the bot to send a message explaining what it can do.
+
+## What it does
 
 The bot tries to parse any message that starts with the word `Roll`. It looks for *X jet* or *X of jet* or *X dice of jet* (and the same for *gold*), and tries to find an Arabic numeral value for *X*. If it can find that for jet and/or gold, it will roll those dice. For example, you could type **Roll 2 dice of jet, and 2 of gold**.
 
@@ -11,5 +17,7 @@ By default, it will interpret those results for both Namedealers and Fated Heroe
 As a helpful and somewhat unrelated utility, you can also say, `Give me a random name`, and it will generate a random name by picking one or two elements randomly from the Well of Names.
 
 You can bring up this information in any channel that the bot is running by sening the message `brhelp`.
+
+## Support
 
 If you're enjoying _The Bloody-Handed Name of Bronze_, consider supporting its creator, Joshua A.C. Newman, on Patreon: http://patreon.com/Joshua
