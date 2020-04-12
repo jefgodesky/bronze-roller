@@ -3,21 +3,21 @@
   "version": "1.0.0",
   "description": "A Discord bot that rolls dice for Joshua A.C. Newman's tabletop roleplaying game, The Bloody-Handed Name of Bronze.",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jefgodesky/bronze-roller.git"
   },
-  "author": "Jason Godesky <jefgodesky@gmail.com>",
-  "license": "CC-BY-SA-4.0",
   "bugs": {
     "url": "https://github.com/jefgodesky/bronze-roller/issues"
   },
+  "author": "Jason Godesky <jefgodesky@gmail.com>",
+  "license": "CC-BY-SA-4.0",
   "homepage": "https://github.com/jefgodesky/bronze-roller#readme",
   "dependencies": {
     "discord.js": "^12.1.1",
     "random": "^2.2.0"
+  },
+  "scripts": {
+    "start": "node index.js"
   }
 }
