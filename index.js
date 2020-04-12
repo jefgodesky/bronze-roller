@@ -109,7 +109,7 @@ const getNamedealerResults = (rolls, username) => {
 const getFatedHeroResults = (rolls, username) => {
   if (players[username] === 'Namedealer') return null
 
-  const feat = rolls.strikes.gold > 2
+  const feat = (rolls.strikes.gold + rolls.strikes.jet > 2) && (rolls.strikes.gold > 0)
     ? 'you may perform a mighty feat, granted abilities greater than those of other mortals. Take a third consequence.'
     : null
 
