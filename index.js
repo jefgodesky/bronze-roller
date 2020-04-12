@@ -49,10 +49,37 @@ const roll = (msg, gold, jet) => {
   let rolls = ''
   goldResults.forEach(r => { rolls = `${rolls} ${emoji.gold[r - 1]}` })
   jetResults.forEach(r => { rolls = `${rolls} ${emoji.jet[r - 1]}` })
+
+  let outcome = ''
+  switch (goldStrikes + jetStrikes) {
+    case 0:
+      outcome = 'You have failed! Your opposition may make a demand of your companion. If you refuse that demand, they may harm your companion!'
+      break
+    case 1:
+      outcome = 'You have succeeded. Choose one consequence.'
+      break
+    case 2:
+      outcome = `You have succeeded. Choose two consequences.`
+      break
+    default:
+      const destinies = goldStrikes + jetStrikes - 2
+      const seize = destinies === 1 ? `a destiny` : `${destinies} destinies`
+      outcome = `You have succeeded! Choose two consequences, and seize ${seize}!`
+      break
+  }
+
+  const vulnerability = goldStrikes > jetStrikes
+    ? 'If you portray a Namedealer, you are vulnerable now, and the Named Ones may demand a labor of you.'
+    : jetStrikes > goldStrikes
+      ? 'If you portray a Fated Hero, you are vulnerable now to your Great Name, who may demand a labor of you.'
+      : null
+
   const reply = [
     rolls.trim(),
-    `You have rolled **${jetStrikesMsg}** upon your mortal dice of jet, and **${goldStrikesMsg}** upon your immortal dice of gold.`
-  ]
+    `You have rolled **${jetStrikesMsg}** upon your mortal dice of jet, and **${goldStrikesMsg}** upon your immortal dice of gold.`,
+    outcome,
+    vulnerability
+  ].filter(l => l !== null)
   msg.reply(reply.join('\n'))
 }
 
