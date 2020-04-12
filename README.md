@@ -1,6 +1,8 @@
 # Bronze Roller
 
-This is a Discord bot that rolls dice for Joshua A.C. Newman's tabletop roleplaying game, _The Bloody-Handed Name of Bronze_. It rolls your mortal dice of jet and your immortal dice of gold.
+This is a Discord bot that rolls dice for Joshua A.C. Newman's tabletop roleplaying game, _The Bloody-Handed Name of Bronze_. It rolls your mortal dice of jet and your immortal dice of gold. You can invite it to your server by using this link:
+
+**[https://discordapp.com/oauth2/authorize?client_id=698552167283425431&scope=bot](https://discordapp.com/oauth2/authorize?client_id=698552167283425431&scope=bot)**
 
 The bot tries to parse any message that starts with the word `Roll`. It looks for *X jet* or *X of jet* or *X dice of jet* (and the same for *gold*), and tries to find an Arabic numeral value for *X*. If it can find that for jet and/or gold, it will roll those dice. For example, you could type **Roll 2 dice of jet, and 2 of gold**.
 
