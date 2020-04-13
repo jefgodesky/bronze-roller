@@ -41,35 +41,47 @@ const findEmoji = () => {
 }
 
 /**
- * Record that the author of this message is playing a Namedealer.
+ * Record that the author's companion.
  * @param msg {Object} - The Discord.js message object.
  */
 
-const assignNamedealer = msg => {
-  const { username } = msg.author
-  players[username] = 'Namedealer'
-}
+const assignCompanion = msg => {
+  const m = msg.content.toLowerCase()
+  const namedealer = m.includes('namedealer') || m.includes('dealer-in-names')
+  const fatedhero = m.includes('fated hero')
+  const nature = namedealer ? 'Namedealer' : fatedhero ? 'Fated Hero' : null
+  let name = null
+  const match = msg.content.match(/I portray ([^ ]*)/i)
+  if (match && match.length > 1) name = match[1].replace(/[\.\-\–\!\?\,\:\;\"\']/, '')
+  if (name === nature || name === 'a') name = null
 
-/**
- * Record that the author of this message is playing a Fated Hero.
- * @param msg {Object} - The Discord.js message object.
- */
+  const channel = msg.channel.id
+  if (!players[channel]) players[channel] = {}
+  players[channel][msg.author.id] = { name, nature }
 
-const assignFatedHero = msg => {
-  const { username } = msg.author
-  players[username] = 'Fated Hero'
+  if (name && nature) {
+    msg.reply(`behold, the ${nature}, ${name}!`)
+  } else if (name) {
+    msg.reply(`behold, ${name}!`)
+  } else if (nature) {
+    msg.reply(`you are seen, ${nature}.`)
+  }
+
+  console.log(players)
 }
 
 /**
  * Interpret dice results for a Namedealer.
  * @param rolls {Object} - An object representing the dice roll results.
- * @param username {string} - The username of the person who sent the message.
+ * @param player {?Object} - The player object for the person who sent the
+ *   message.
  * @returns {string|null} - A string interpreting dice results for a
  *   Namedealer, or `null` if there's nothing to report for a Namedealer.
  */
 
-const getNamedealerResults = (rolls, username) => {
-  if (players[username] === 'Fated Hero') return null
+const getNamedealerResults = (rolls, player) => {
+  const nature = player && player.nature ? player.nature : null
+  if (nature === 'Fated Hero') return null
 
   const { gold, jet } = rolls.strikes
   let destinies = null
@@ -84,7 +96,7 @@ const getNamedealerResults = (rolls, username) => {
     vulnerability = 'you are vulnerable to your Named Ones now. They may demand a labor of you.'
   }
 
-  let reply = players[username] === 'Namedealer' ? '**As a Namedealer**,' : '**If you are a Namedealer,**'
+  let reply = nature === 'Namedealer' ? '**As a Namedealer**,' : '**If you are a Namedealer,**'
   if (destinies && vulnerability) {
     reply = `${reply} ${destinies}, and ${vulnerability}`
   } else if (destinies) {
@@ -101,13 +113,15 @@ const getNamedealerResults = (rolls, username) => {
 /**
  * Interpret dice results for a Fated Hero.
  * @param rolls {Object} - An object representing the dice roll results.
- * @param username {string} - The username of the person who sent the message.
+ * @param player {?Object} - The player object for the person who sent the
+ *   message.
  * @returns {string|null} - A string interpreting dice results for a Fated
  *   Hero, or `null` if there's nothing to report for a Fated Hero.
  */
 
-const getFatedHeroResults = (rolls, username) => {
-  if (players[username] === 'Namedealer') return null
+const getFatedHeroResults = (rolls, player) => {
+  const nature = player && player.nature ? player.nature : null
+  if (nature === 'Namedealer') return null
 
   const feat = (rolls.strikes.gold + rolls.strikes.jet > 2) && (rolls.strikes.gold > 0)
     ? 'you may perform a mighty feat, granted abilities greater than those of other mortals. Take a third consequence.'
@@ -127,7 +141,7 @@ const getFatedHeroResults = (rolls, username) => {
     vulnerability = 'you are vulnerable to your Great Name now. They may demand a labor of you.'
   }
 
-  let reply = players[username] === 'Fated Hero' ? '**As a Fated Hero**,' : '**If you are a Fated Hero,**'
+  let reply = nature === 'Fated Hero' ? '**As a Fated Hero**,' : '**If you are a Fated Hero,**'
   if (feat && destinies && vulnerability) {
     reply = `${reply} ${feat} ${capitalize(destinies)}. ${capitalize(vulnerability)}`
   } else if (feat && destinies) {
@@ -157,8 +171,11 @@ const getFatedHeroResults = (rolls, username) => {
  */
 
 const roll = (msg, gold, jet) => {
-  const { username } = msg.author
+  const user = msg.author.id
+  const channel = msg.channel.id
+  const player = players[channel] && players[channel][user] ? players[channel][user] : null
   if (Object.keys(emoji).length === 0) findEmoji()
+
   const roll = { results: { gold: [], jet: [] }, strikes: { gold: 0, jet: 0 } }
   for (let g = 0; g < gold; g++) roll.results.gold.push(random.int(1, 6))
   for (let j = 0; j < jet; j++) roll.results.jet.push(random.int(1, 6))
@@ -187,8 +204,8 @@ const roll = (msg, gold, jet) => {
     rolls.trim(),
     `You have rolled **${jetStrikesMsg}** upon your mortal dice of jet, and **${goldStrikesMsg}** upon your immortal dice of gold.`,
     outcome,
-    getNamedealerResults(roll, username),
-    getFatedHeroResults(roll, username)
+    getNamedealerResults(roll, player),
+    getFatedHeroResults(roll, player)
   ].filter(l => l !== null)
   msg.reply(reply.join('\n'))
 }
@@ -211,17 +228,11 @@ client.on('message', msg => {
     if (jet + gold > 0) {
       roll(msg, gold, jet)
     }
-  } else if (m.startsWith('give me a random name')) {
-    msg.reply(randomName())
-  } else if (m.startsWith('i portray a namedealer')) {
-    assignNamedealer(msg)
-  } else if (m.startsWith('my companion is a namedealer')) {
-    assignNamedealer(msg)
-  } else if (m.startsWith('i portray a fated hero')) {
-    assignFatedHero(msg)
-  } else if (m.startsWith('my companion is a fated hero')) {
-    assignFatedHero(msg)
-  } else if (m.startsWith('brhelp')) {
+  } else if (m.includes('draw from the well of names')) {
+    msg.reply(`Behold, ${randomName()}!`)
+  } else if (m.startsWith('i portray')) {
+    assignCompanion(msg)
+  } else if (m.startsWith('what binds you, bash')) {
     const help = [
       `**Bronze Roller** is here to make it easier to play Joshua A.C. Newman's tabletop roleplaying game _The Bloody-Handed Name of Bronze_ over Discord. It rolls your mortal dice of jet and your immortal dice of gold.`,
       `The bot tries to parse any message that starts with the word **Roll**. It looks for *X jet* or *X of jet* or *X dice of jet* (and the same for *gold*), and tries to find an Arabic numeral value for *X*. If it can find that for jet and/or gold, it will roll those dice. For example, you could type **Roll 2 dice of jet, and 2 of gold**.`,
