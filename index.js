@@ -1,6 +1,7 @@
 const Discord = require('discord.js')
 const random = require('random')
 const client = new Discord.Client()
+const { randomElement } = require('./utils')
 const { randomName } = require('./names')
 const config = require('./config.json')
 const emoji = {}
@@ -242,6 +243,14 @@ client.on('message', msg => {
         `When you encounter a Named-One, but do not know its Name, you may command, **Draw from the Well of Names**, and I shall reveal its name.`
       ]
       msg.reply(help.join('\n\n'))
+    } else if (m.startsWith('tell us about yourself, bash')) {
+      msg.reply(randomElement([
+        `The Great Name of Ashu, whose wings span the sky of the River Ashug, is one of my siblings. There are 999 of us, but I have not spoken to Ashu in a millennium. Yes, I suppose there is a family resemblance.`,
+        `I am a Descendant of the Heavens, but if that answer sates your curiosity, then you are even more small-minded than I thought, for that answer reveals no more than when I call you an Earthen-Being.`,
+        `Those Who Know the Will of the Names of the World may know the desires of my heart, but if they are not already known to you, then neither shall I speak them.`,
+        `Do you think that because you have given Fate that name that now you may know its desires? Earthen-Being, even those who dwell in the Heavens above or the Underworld below may not know such things. Fate reveals its desires only as she unfolds.`,
+        `The ancient laws of reciprocity demand that you pay tribute to the Great Name whose words first shaped the World of Names and gave it form! https://patreon.com/Joshua`
+      ]))
     }
   }
 })
