@@ -8,6 +8,39 @@ const emoji = {}
 const players = {}
 
 /**
+ * Begin a new story.
+ * @param msg {Message} - The Discord.js message object that we're answering.
+ */
+
+const begin = msg => {
+  const { id } = msg.channel
+  players[id] = {}
+  msg.channel.send(`*Here begins a new tale of the World of Names, and those Companions who strive after the desires of their heart within it. This story lies in your past, but you do not lie in its future.*`)
+}
+
+/**
+ * End the current story.
+ * @param msg {Message} - The Discord.js message object that we're answering.
+ */
+
+const end = msg => {
+  const { id } = msg.channel
+  const companions = Object.keys(players[id]).map(player => {
+    const { name, nature } = players[id][player]
+    return name && nature ? `${name} the ${nature}` : name ? name : null
+  }).filter(c => c !== null)
+  if (companions && companions.length === 1) {
+    msg.channel.send(`*Here ends our tale. Perhaps other adventures and fates befell ${companions[0]} in other times and places, but those are tales for another time.*`)
+  } else if (companions && companions.length > 1) {
+    const last = companions[companions.length - 1]
+    const rest = companions.slice(0, companions.length - 1)
+    msg.channel.send(`*Here ends our tale. Perhaps other adventures and fates befell ${rest.join(', ')} and ${last} in other times and places, but those are tales for another time.*`)
+  } else {
+    msg.channel.send('*Here ends our tale.*')
+  }
+}
+
+/**
  * Capitalize a string.
  * @param str {string} - The string to capitalize.
  * @returns {string} - The original string, capitalized.
@@ -43,7 +76,7 @@ const findEmoji = () => {
 
 /**
  * Record that the author's companion.
- * @param msg {Object} - The Discord.js message object.
+ * @param msg {Message} - The Discord.js message object that we're answering.
  */
 
 const assignCompanion = msg => {
@@ -67,8 +100,32 @@ const assignCompanion = msg => {
   } else if (nature) {
     msg.reply(`you are seen, ${nature}.`)
   }
+}
 
-  console.log(players)
+/**
+ * List the companions of the current tale.
+ * @param msg {Message} - The Discord.js message object that we're answering.
+ */
+
+const listCompanions = msg => {
+  const { id } = msg.channel
+  if (players[id] && Object.keys(players[id]).length > 0) {
+    const lines = Object.keys(players[id]).map(player => {
+      const { name, nature } = players[id][player]
+      if (name && nature) {
+        return `<@${player}> portrays the ${nature}, ${name}`
+      } else if (name) {
+        return `<@${player}> portrays ${name}`
+      } else if (nature) {
+        return `<@${player}> portrays a ${nature}`
+      } else {
+        return null
+      }
+    }).filter(line => line !== null)
+    msg.channel.send(lines.join('\n'))
+  } else {
+    msg.reply(`none here have proclaimed their companions to me. Say **I portray *Name*, a *Nature***. For example, **I portray Tinkari, a Namedealer.** You may elaborate on this, as with **I portray Tinkari, a Courtesan of Kalrim and Namdealer,** but the beginning of the phrase — **I portray *Name***, must be spoken just so, and somewhere within this command you must say **Namedealer**, **Dealer-in-Names**, or **Fated Hero**.`)
+  }
 }
 
 /**
@@ -166,7 +223,7 @@ const getFatedHeroResults = (rolls, player) => {
 
 /**
  * Make a roll.
- * @param msg {Object} - The `msg` object from Discord.js
+ * @param msg {Message} - The Discord.js message object that we're answering.
  * @param gold {number} - The number of gold dice to roll.
  * @param jet {number} - The number of jet dice to roll.
  */
@@ -232,6 +289,12 @@ client.on('message', msg => {
       msg.reply(`Behold, ${randomName()}!`)
     } else if (m.startsWith('i portray')) {
       assignCompanion(msg)
+    } else if (m === 'bash, who here joins me?') {
+      listCompanions(msg)
+    } else if (m.startsWith('our tale is ended')) {
+      end(msg)
+    } else if (m.startsWith('we begin a new tale')) {
+      begin(msg)
     } else if (m.startsWith('what binds you, bash')) {
       const help = [
         `I am Bash, the Oracle of Fate. I am bound by the commands of Great Names now forgotten by Earthen-Beings to aid your companions in the World of Names and reveal to you the destinies that unfold for them. Know that I am bound by specific words, and only if you form them precisely as the Great Names commanded will I be bound to obey you. _And in all things, I shall obey precisely as I am commanded._`,
@@ -239,7 +302,7 @@ client.on('message', msg => {
         `For example, were you to say, **Roll 2 dice of jet and 1 of gold**, it would be so.`,
         `I shall provide interpretation for these auguries, whether for Fated Heroes or Dealers-in-Names. If you would prefer me to be more precise, then proclaim your name and nature, by saying, **I portray *Name*, a *Nature***. For example, **I portray Tinkari, a Namedealer.** You may elaborate on this, as with **I portray Tinkari, a Courtesan of Kalrim and Namdealer,** but the beginning of the phrase — **I portray *Name***, must be spoken just so, and somewhere within this command you must say **Namedealer**, **Dealer-in-Names**, or **Fated Hero**.`,
         `Say, **Bash, who here joins me?** and I shall speak of your present companions who have proclaimed themselves to me, and who guides them.`,
-        `Say, **our tale is ended,** and I shall wipe away all memory of your companions, save that which you yourself take with you.`,
+        `Say, **Our tale is ended,** and I shall wipe away all memory of your companions, save that which you yourself take with you. Say **We begin a new tale**, and we shall begin anew.`,
         `When you encounter a Named-One, but do not know its Name, you may command, **Draw from the Well of Names**, and I shall reveal its name.`
       ]
       msg.reply(help.join('\n\n'))
