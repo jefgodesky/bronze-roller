@@ -215,32 +215,34 @@ const roll = (msg, gold, jet) => {
  */
 
 client.on('message', msg => {
-  const m = msg.content.toLowerCase()
-  if (m.startsWith('roll')) {
-    const jetMatch = m.match(/(\d+) (dice of )?(of )?jet/i)
-    const jetParse = jetMatch && jetMatch.length > 1 ? parseInt(jetMatch[1]) : undefined
-    const jet = !jetParse || isNaN(jetParse) ? 0 : jetParse
+  if (!msg.author.bot) {
+    const m = msg.content.toLowerCase()
+    if (m.startsWith('roll')) {
+      const jetMatch = m.match(/(\d+) (dice of )?(of )?jet/i)
+      const jetParse = jetMatch && jetMatch.length > 1 ? parseInt(jetMatch[1]) : undefined
+      const jet = !jetParse || isNaN(jetParse) ? 0 : jetParse
 
-    const goldMatch = m.match(/(\d+) (dice of )?(of )?gold/i)
-    const goldParse = goldMatch && goldMatch.length > 1 ? parseInt(goldMatch[1]) : undefined
-    const gold = !goldParse || isNaN(goldParse) ? 0 : goldParse
+      const goldMatch = m.match(/(\d+) (dice of )?(of )?gold/i)
+      const goldParse = goldMatch && goldMatch.length > 1 ? parseInt(goldMatch[1]) : undefined
+      const gold = !goldParse || isNaN(goldParse) ? 0 : goldParse
 
-    if (jet + gold > 0) {
-      roll(msg, gold, jet)
+      if (jet + gold > 0) { roll(msg, gold, jet) }
+    } else if (m.includes('draw from the well of names')) {
+      msg.reply(`Behold, ${randomName()}!`)
+    } else if (m.startsWith('i portray')) {
+      assignCompanion(msg)
+    } else if (m.startsWith('what binds you, bash')) {
+      const help = [
+        `I am Bash, the Oracle of Fate. I am bound by the commands of Great Names now forgotten by Earthen-Beings to aid your companions in the World of Names and reveal to you the destinies that unfold for them. Know that I am bound by specific words, and only if you form them precisely as the Great Names commanded will I be bound to obey you. _And in all things, I shall obey precisely as I am commanded._`,
+        `When your message begins with the command, **Roll**, then I shall look for your mortal dice of jet and your immortal dice of gold. I shall only respond to the numerals of the Arabs: 1, 2, 3, and so on. You may specify *2 gold*, or *2 of gold*, or *2 dice of gold*, or the same of jet. If I can find within your command a single mortal die of jet or a single immortal die of gold, I shall cast those lots, and your fate will be revealed!`,
+        `For example, were you to say, **Roll 2 dice of jet and 1 of gold**, it would be so.`,
+        `I shall provide interpretation for these auguries, whether for Fated Heroes or Dealers-in-Names. If you would prefer me to be more precise, then proclaim your name and nature, by saying, **I portray *Name*, a *Nature***. For example, **I am Tinkari, a Courtesan of Kalrim and Namdealer.**`,
+        `Say, **Bash, who here joins me?** and I shall speak of your present companions.`,
+        `Say, **our tale is ended,** and I shall wipe away all memory of your companions, save that which you yourself take with you.`,
+        `When you encounter a Named-One, but do not know its Name, you may command, **Draw from the Well of Names**, and I shall reveal its name.`
+      ]
+      msg.reply(help.join('\n\n'))
     }
-  } else if (m.includes('draw from the well of names')) {
-    msg.reply(`Behold, ${randomName()}!`)
-  } else if (m.startsWith('i portray')) {
-    assignCompanion(msg)
-  } else if (m.startsWith('what binds you, bash')) {
-    const help = [
-      `**Bronze Roller** is here to make it easier to play Joshua A.C. Newman's tabletop roleplaying game _The Bloody-Handed Name of Bronze_ over Discord. It rolls your mortal dice of jet and your immortal dice of gold.`,
-      `The bot tries to parse any message that starts with the word **Roll**. It looks for *X jet* or *X of jet* or *X dice of jet* (and the same for *gold*), and tries to find an Arabic numeral value for *X*. If it can find that for jet and/or gold, it will roll those dice. For example, you could type **Roll 2 dice of jet, and 2 of gold**.`,
-      `By default, it will interpret those results for both Namedealers and Fated Heroes, so you might want to say **I portray a Namedealer** or **My companion is a Namedealer**, or **I portray a Fated Hero** or **My companion is a Fated Hero**. The bot will remember that and then only show you the interpretation for your companion's nature.`,
-      `As a helpful and somewhat unrelated utility, you can also say, **Give me a random name**, and it will generate a random name by picking one or two elements randomly from the Well of Names.`,
-      `If you're enjoying _The Bloody-Handed Name of Bronze_, consider supporting its creator, Joshua A.C. Newman, on Patreon: http://patreon.com/Joshua`
-    ]
-    msg.reply(help.join('\n\n'))
   }
 })
 
