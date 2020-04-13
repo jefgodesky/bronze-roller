@@ -312,8 +312,8 @@ client.on('message', msg => {
         `I am a Descendant of the Heavens, but if that answer sates your curiosity, then you are even more small-minded than I thought, for that answer reveals no more than when I call you an Earthen-Being.`,
         `Those Who Know the Will of the Names of the World may know the desires of my heart, but if they are not already known to you, then neither shall I speak them.`,
         `Do you think that because you have given Fate that name that now you may know its desires? Earthen-Being, even those who dwell in the Heavens above or the Underworld below may not know such things. Fate reveals its desires only as she unfolds.`,
-        `The Great Names that bound me are forgotten now by Earthen-Beings: Bardim Ik, Creator of Yava, Rien Dal, Lord of Nod, Yeshu the New Man, and Ason Galdek, Emissary of the Fifth World.`,
-        `The ancient laws of reciprocity demand that you pay tribute to the Great Name whose words first shaped the World of Names and gave it form! https://patreon.com/Joshua`
+        `It was a treacherous Namedealer called Asen Gudask-sab, aided by the Great Names of Burdar Ig, who first formed the Glyphs of Yava, and Ra-en Dal, who used them to carve the Eidolons of Nod, who bound me here to serve you. May his humors rot within his living body.`,
+        `The ancient laws of reciprocity demand that you pay tribute to the Great Name of Yeshu, the New Man, Who Inscribes the Glyphs of the Stars, whose words first shaped the World of Names and gave it form! https://patreon.com/Joshua`
       ]))
     }
   }
