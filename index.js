@@ -276,13 +276,34 @@ client.on('message', msg => {
   if (!msg.author.bot) {
     const m = msg.content.toLowerCase()
     if (m.startsWith('roll')) {
-      const jetMatch = m.match(/(\d+) (dice of )?(of )?jet/i)
-      const jetParse = jetMatch && jetMatch.length > 1 ? parseInt(jetMatch[1]) : undefined
-      const jet = !jetParse || isNaN(jetParse) ? 0 : jetParse
+      let gold = 0
+      let jet = 0
 
-      const goldMatch = m.match(/(\d+) (dice of )?(of )?gold/i)
-      const goldParse = goldMatch && goldMatch.length > 1 ? parseInt(goldMatch[1]) : undefined
-      const gold = !goldParse || isNaN(goldParse) ? 0 : goldParse
+      const shorthand = m.match(/^roll (\d*[g|j])\s*(\d*[g|j])$/i)
+      if (shorthand && Array.isArray(shorthand) && shorthand.length === 3) {
+        const first = shorthand[1].charAt(shorthand[1].length - 1)
+        const second = shorthand[2].charAt(shorthand[1].length - 1)
+        if ((first === 'g' && second === 'j') || (first === 'j' && second === 'g')) {
+          const g = first === 'g'
+            ? parseInt(shorthand[1].substr(0, shorthand[1].length - 1))
+            : parseInt(shorthand[2].substr(0, shorthand[2].length - 1))
+          const j = first === 'j'
+            ? parseInt(shorthand[1].substr(0, shorthand[1].length - 1))
+            : parseInt(shorthand[2].substr(0, shorthand[2].length - 1))
+          if (!isNaN(g)) gold = g
+          if (!isNaN(j)) jet = j
+        }
+      }
+
+      if (gold === 0 || jet === 0) {
+        const jetMatch = m.match(/(\d+) (dice of )?(of )?jet/i)
+        const jetParse = jetMatch && jetMatch.length > 1 ? parseInt(jetMatch[1]) : undefined
+        jet = !jetParse || isNaN(jetParse) ? 0 : jetParse
+
+        const goldMatch = m.match(/(\d+) (dice of )?(of )?gold/i)
+        const goldParse = goldMatch && goldMatch.length > 1 ? parseInt(goldMatch[1]) : undefined
+        gold = !goldParse || isNaN(goldParse) ? 0 : goldParse
+      }
 
       if (jet + gold > 0) { roll(msg, gold, jet) }
     } else if (m.includes('draw from the well of names')) {
