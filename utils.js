@@ -15,4 +15,14 @@ const randomElement = arr => {
   }
 }
 
-module.exports = { randomElement }
+/**
+ * Capitalize a string.
+ * @param str {string} - The string to capitalize.
+ * @returns {string} - The original string, capitalized.
+ */
+
+const capitalize = str => {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+module.exports = { randomElement, capitalize }
