@@ -42,6 +42,7 @@ const end = msg => {
   } else {
     msg.channel.send('**Here ends our tale.**')
   }
+  players[id] = {}
 }
 
 /**
