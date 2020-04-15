@@ -15,7 +15,11 @@ const players = {}
 const begin = msg => {
   const { id } = msg.channel
   players[id] = {}
-  msg.channel.send(`*Here begins a new tale of the World of Names, and those Companions who strive after the desires of their heart within it. This story lies in your past, but you do not lie in its future.*`)
+  const lines = [
+    `**Here begins a new tale** of the World of Names, and those Companions who strive after the desires of their heart within it. This story lies in your past, but you do not lie in its future.`,
+    `*We need your help to make this game fun for everyone. If anything makes anyone uncomfortable in any way send a message that just say **X** to this channel. I'll immediately delete it and replace it with a message to let everyone know something has gone wrong. You don’t have to explain why. It doesn't matter why. When you type **X**, we simply edit out anything x'ed. And if there is ever an issue, anyone can call for a break and we can talk privately. I know it sounds funny but it will help us play amazing games together. Please help make this game fun for everyone. Thank you!*`
+  ]
+  msg.channel.send(lines.join('\n\n'))
 }
 
 /**
@@ -30,13 +34,13 @@ const end = msg => {
     return name && nature ? `${name} the ${nature}` : name ? name : null
   }).filter(c => c !== null)
   if (companions && companions.length === 1) {
-    msg.channel.send(`*Here ends our tale. Perhaps other adventures and fates befell ${companions[0]} in other times and places, but those are tales for another time.*`)
+    msg.channel.send(`**Here ends our tale.** Perhaps other adventures and fates befell ${companions[0]} in other times and places, but those are tales for another time.`)
   } else if (companions && companions.length > 1) {
     const last = companions[companions.length - 1]
     const rest = companions.slice(0, companions.length - 1)
-    msg.channel.send(`*Here ends our tale. Perhaps other adventures and fates befell ${rest.join(', ')} and ${last} in other times and places, but those are tales for another time.*`)
+    msg.channel.send(`**Here ends our tale.** Perhaps other adventures and fates befell ${rest.join(', ')} and ${last} in other times and places, but those are tales for another time.`)
   } else {
-    msg.channel.send('*Here ends our tale.*')
+    msg.channel.send('**Here ends our tale.**')
   }
 }
 
@@ -269,13 +273,30 @@ const roll = (msg, gold, jet) => {
 }
 
 /**
+ * Tap the X-Card
+ * @param msg {Message} - The Discord.js message object that we're answering.
+ */
+
+const x = async msg => {
+  const channel = msg.channel
+  try {
+    await msg.delete()
+    channel.send(`@here **STOP!** Someone has a problem with what just happened. Edit it out. Remember, stopping to talk about what's going on is *always* an option.`)
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+/**
  * The main message processor.
  */
 
 client.on('message', msg => {
   if (!msg.author.bot) {
     const m = msg.content.toLowerCase()
-    if (m.startsWith('roll')) {
+    if (m === 'x') {
+      x(msg)
+    } else if (m.startsWith('roll')) {
       let gold = 0
       let jet = 0
 
