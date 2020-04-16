@@ -1,6 +1,7 @@
 const Discord = require('discord.js')
 const client = new Discord.Client()
 const config = require('./config.json')
+const State = require('./state')
 
 const { begin, end, assignCompanion, listCompanions } = require('./commands/story')
 const parseRoll = require('./commands/roll')
@@ -9,14 +10,9 @@ const help = require('./commands/help')
 const personality = require('./commands/personality')
 const drawName = require('./commands/names')
 
-const state = { channels: {} }
-client.once('ready', async () => {
-  const count = []
-  for (let i = 1; i < 7; i++) count.push(i)
-  state.emoji = {
-    gold: count.map(i => client.emojis.cache.find(emoji => emoji.name === `gold${i}`)),
-    jet: count.map(i => client.emojis.cache.find(emoji => emoji.name === `jet${i}`))
-  }
+const state = new State()
+client.once('ready', () => {
+  state.loadEmoji(client)
 })
 
 client.on('message', msg => {

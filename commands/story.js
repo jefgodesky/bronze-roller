@@ -1,12 +1,11 @@
 /**
  * Begin a new story.
  * @param msg {Message} - The Discord.js message object that we're answering.
- * @param state {Object} - An object with the current state of play.
+ * @param state {!State} - An object with the current state of play.
  */
 
 const begin = (msg, state) => {
-  const { id } = msg.channel
-  state.channels[id] = {}
+  state.reset(msg.channel.id)
   const lines = [
     `**Here begins a new tale** of the World of Names, and those Companions who strive after the desires of their heart within it. This story lies in your past, but you do not lie in its future.`,
     `*We need your help to make this game fun for everyone. If anything makes anyone uncomfortable in any way send a message that just say **X** to this channel. I'll immediately delete it and replace it with a message to let everyone know something has gone wrong. You don’t have to explain why. It doesn't matter why. When you type **X**, we simply edit out anything x'ed. And if there is ever an issue, anyone can call for a break and we can talk privately. I know it sounds funny but it will help us play amazing games together. Please help make this game fun for everyone. Thank you!*`
@@ -21,10 +20,15 @@ const begin = (msg, state) => {
  */
 
 const end = (msg, state) => {
-  const { id } = msg.channel
-  const companions = Object.keys(state.channels[id]).map(player => {
-    const { name, nature } = state.channels[id][player]
-    return name && nature ? `${name} the ${nature}` : name ? name : null
+  const companions = state.reset(msg.channel.id).map(c => {
+    const { name, nature } = c
+    if (name && nature) {
+      return `${name} the ${nature}`
+    } else if (name) {
+      return name
+    } else {
+      return null
+    }
   }).filter(c => c !== null)
   if (companions && companions.length === 1) {
     msg.channel.send(`**Here ends our tale.** Perhaps other adventures and fates befell ${companions[0]} in other times and places, but those are tales for another time.`)
@@ -35,7 +39,6 @@ const end = (msg, state) => {
   } else {
     msg.channel.send('**Here ends our tale.**')
   }
-  state.channels[id] = {}
 }
 
 /**
@@ -54,10 +57,7 @@ const assignCompanion = (msg, state) => {
   if (match && match.length > 1) name = match[1].replace(/[\.\-\–\!\?\,\:\;\"\']/, '')
   if (name === nature || name === 'a') name = null
 
-  const channel = msg.channel.id
-  if (!state.channels[channel]) state.channels[channel] = {}
-  state.channels[channel][msg.author.id] = { name, nature }
-
+  state.setPlayer(msg.channel.id, msg.author.id, name, nature)
   if (name && nature) {
     msg.reply(`behold, the ${nature}, ${name}!`)
   } else if (name) {
@@ -74,20 +74,20 @@ const assignCompanion = (msg, state) => {
  */
 
 const listCompanions = (msg, state) => {
-  const { id } = msg.channel
-  if (state.channels && state.channels[id] && Object.keys(state.channels[id]).length > 0) {
-    const lines = Object.keys(state.channels[id]).map(player => {
-      const { name, nature } = state.channels[id][player]
+  const companions = state.getPlayers(msg.channel.id)
+  if (companions.length > 0) {
+    const lines = companions.map(c => {
+      const { player, name, nature } = c
       if (name && nature) {
         return `<@${player}> portrays the ${nature}, ${name}`
       } else if (name) {
-        return `<@${player}> portrays ${name}`
+        `<@${player}> portrays ${name}`
       } else if (nature) {
-        return `<@${player}> portrays a ${nature}`
+        `<@${player}> portrays a ${nature}`
       } else {
         return null
       }
-    }).filter(line => line !== null)
+    }).filter(c => c !== null)
     msg.channel.send(lines.join('\n'))
   } else {
     msg.reply(`none here have proclaimed their companions to me. Say **I portray *Name*, a *Nature***. For example, **I portray Tinkari, a Namedealer.** You may elaborate on this, as with **I portray Tinkari, a Courtesan of Kalrim and Namdealer,** but the beginning of the phrase — **I portray *Name***, must be spoken just so, and somewhere within this command you must say **Namedealer**, **Dealer-in-Names**, or **Fated Hero**.`)

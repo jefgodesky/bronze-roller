@@ -117,7 +117,7 @@ const roll = (gold, jet) => {
 /**
  * Interpret dice results.
  * @param msg {!Message} - The Discord.js message object that we're answering.
- * @param players {!Object} - An object with the current state of play.
+ * @param state {!State} - An object with the current state of play.
  * @param roll { gold: number[], jet: number[], strikes: { gold: number,
  *   jet: number } } - An object with three properties. `gold` and `jet` each
  *   contain an array of integers that are the result of a dice roll. `strikes`
@@ -126,10 +126,7 @@ const roll = (gold, jet) => {
  */
 
 const interpret = (msg, state, roll) => {
-  const user = msg.author.id
-  const channel = msg.channel.id
-  const player = state.channels && state.channels[channel] && state.channels[channel][user] ? state.channels[channel][user] : null
-
+  const player = state.getSender(msg)
   const goldStrikesMsg = roll.strikes.gold === 0 ? 'no strikes' : roll.strikes.gold === 1 ? '1 strike' : `${roll.strikes.gold} strikes`
   const jetStrikesMsg = roll.strikes.jet === 0 ? 'no strikes' : roll.strikes.jet === 1 ? '1 strike' : `${roll.strikes.jet} strikes`
 
@@ -163,7 +160,7 @@ const interpret = (msg, state, roll) => {
 /**
  * Parse a roll command.
  * @param msg {!Message} - The Discord.js message object that we're answering.
- * @param state {!Object} - An object with the current state of play.
+ * @param state {!State} - An object with the current state of play.
  */
 
 const parseRoll = (msg, state) => {
