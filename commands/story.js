@@ -8,7 +8,7 @@ const begin = (msg, state) => {
   state.reset(msg.channel.id)
   const lines = [
     `**Here begins a new tale** of the World of Names, and those Companions who strive after the desires of their heart within it. This story lies in your past, but you do not lie in its future.`,
-    `*We need your help to make this game fun for everyone. If anything makes anyone uncomfortable in any way send a message that just say **X** to this channel. I'll immediately delete it and replace it with a message to let everyone know something has gone wrong. You don’t have to explain why. It doesn't matter why. When you type **X**, we simply edit out anything x'ed. And if there is ever an issue, anyone can call for a break and we can talk privately. I know it sounds funny but it will help us play amazing games together. Please help make this game fun for everyone. Thank you!*`
+    `*We need your help to make this game fun for everyone. If anything makes anyone uncomfortable in any way send a private message that just says **X** to me, Bash, the Oracle of Fate. I'll send a message to this channel to let everyone know something has gone wrong. You don’t have to explain why. It doesn't matter why. When you send me a private message consisting of just the letter **X**, we simply edit out anything x'ed. And if there is ever an issue, anyone can call for a break and we can talk privately. I know it sounds funny but it will help us play amazing games together. Please help make this game fun for everyone. Thank you!*`
   ]
   msg.channel.send(lines.join('\n\n'))
 }

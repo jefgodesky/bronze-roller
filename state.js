@@ -67,6 +67,16 @@ class State {
   }
 
   /**
+   * Return an array of channel ID's that the player is in.
+   * @param id {string} - The player ID.
+   * @returns {string[]} - An array of channel ID's that the player is in.
+   */
+
+  findChannelsWithPlayer (id) {
+    return Object.keys(this.channels).filter(channel => Object.keys(this.channels[channel]).includes(id))
+  }
+
+  /**
    * Reset a channel's data, but return what was in it first.
    * @param channel {string} - The ID of the channel to reset.
    * @returns {{ name: string, nature: string }[]} - An array of objects

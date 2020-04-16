@@ -21,7 +21,7 @@ client.on('message', msg => {
   const m = content.toLowerCase()
 
   if (m === 'x') {
-    x(msg)
+    x(msg, client, state)
   } else if (m.startsWith('roll')) {
     parseRoll(msg, state)
   } else if (m.includes('draw from the well of names')) {
